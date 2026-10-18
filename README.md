@@ -33,3 +33,7 @@ NEXTAUTH_SECRET="<random 32+ karakter>"
 ```
 
 Jalankan migrasi: `npx prisma migrate deploy`
+
+## Deploy
+
+Terhubung ke Vercel (project `qrcode`) — setiap push ke `main` otomatis deploy ke production.
