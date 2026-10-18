@@ -1,0 +1,44 @@
+// Barcode Studio v2 — Prisma schema (PostgreSQL / Neon)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String      @id @default(cuid())
+  name      String?
+  email     String      @unique
+  password  String
+  createdAt DateTime    @default(now())
+  history   HistoryItem[]
+  logos     SavedLogo[]
+}
+
+model HistoryItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      String   // "qr" | "barcode"
+  label     String
+  payload   Json     // full generator settings (colors, size, text, logo dataURL, ...)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model SavedLogo {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  mime      String   @default("image/png")
+  data      Bytes
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}

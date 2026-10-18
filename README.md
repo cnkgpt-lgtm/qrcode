@@ -1,6 +1,7 @@
 # Barcode Studio
 
-Aplikasi pembuat **QR Code** & **barcode 1D** siap cetak — satu file HTML, 100% berjalan di browser, tanpa server, bisa dibuka offline.
+Aplikasi pembuat **QR Code** & **barcode 1D** siap cetak — dengan **akun pengguna**,
+**riwayat tersimpan**, dan **logo tersimpan**.
 
 ## Fitur
 
@@ -10,15 +11,25 @@ Aplikasi pembuat **QR Code** & **barcode 1D** siap cetak — satu file HTML, 100
 - **Barcode 1D** — CODE128/A/B/C, EAN-13/8, UPC-A/E, CODE39, ITF-14, MSI, Pharmacode, Codabar
 - **Download PNG** resolusi penuh & **SVG** vektor
 - **Mode Batch** — banyak nilai sekaligus → pratinjau grid → unduh sebagai ZIP
+- **Akun** — daftar & masuk (email + kata sandi)
+- **Riwayat per pengguna** — simpan hasil ke akun, muat lagi kapan pun, hapus
+- **Logo tersimpan** — simpan logo ke akun, pakai ulang tanpa upload lagi
 
-## Cara pakai
+## Teknologi
 
-Buka `index.html` di browser. Atau deploy ke hosting statis apa pun (Vercel, Netlify, GitHub Pages) — tidak perlu build.
+Next.js 15 + React 19 + Tailwind CSS v4 + Prisma (PostgreSQL/Neon) + NextAuth v5.
+Proses gambar 100% di browser (client-side):
 
-## Teknis
+- [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) (MIT)
+- [JsBarcode](https://github.com/lindell/JsBarcode) (MIT)
+- [JSZip](https://github.com/Stuk/jszip) (MIT)
 
-Tanpa framework & tanpa build step. Library di-inline langsung ke file HTML:
+## Env yang dibutuhkan
 
-- [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) (MIT) — QR Code
-- [JsBarcode](https://github.com/lindell/JsBarcode) (MIT) — barcode 1D
-- [JSZip](https://github.com/Stuk/jszip) (MIT) — arsip ZIP mode batch
+```
+DATABASE_URL="postgresql://... (pooler)"
+DIRECT_URL="postgresql://... (direct, tanpa pooler)"
+NEXTAUTH_SECRET="<random 32+ karakter>"
+```
+
+Jalankan migrasi: `npx prisma migrate deploy`
