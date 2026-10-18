@@ -37,3 +37,5 @@ Jalankan migrasi: `npx prisma migrate deploy`
 ## Deploy
 
 Terhubung ke Vercel (project `qrcode`) — setiap push ke `main` otomatis deploy ke production.
+
+> Status: live.
