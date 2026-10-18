@@ -1,4 +1,4 @@
-# Barcode Studio
+# Accank Barcode Studio
 
 Aplikasi pembuat **QR Code** & **barcode 1D** siap cetak — dengan **akun pengguna**,
 **riwayat tersimpan**, dan **logo tersimpan**.

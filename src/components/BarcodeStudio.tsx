@@ -68,9 +68,12 @@ function renderQR(target: HTMLCanvasElement, text: string, o: QrOpts): number {
     const by = (o.size - lp) / 2 - pad;
     const bs = lp + pad * 2;
     c.save();
-    c.fillStyle = "#ffffff";
-    rr(c, bx, by, bs, bs, rad + pad * 0.6);
-    c.fill();
+    if (!o.transparent) {
+      // Badge putih hanya bila background tidak transparan
+      c.fillStyle = "#ffffff";
+      rr(c, bx, by, bs, bs, rad + pad * 0.6);
+      c.fill();
+    }
     c.clip();
     c.drawImage(o.logo, (o.size - lp) / 2, (o.size - lp) / 2, lp, lp);
     c.restore();
@@ -106,7 +109,9 @@ function qrSVG(text: string, o: QrOpts): string {
     tmp.width = o.logo.naturalWidth || o.logo.width;
     tmp.height = o.logo.naturalHeight || o.logo.height;
     tmp.getContext("2d")!.drawImage(o.logo, 0, 0);
-    s += `<rect x="${bx}" y="${by}" width="${bs}" height="${bs}" rx="${rad + pad * 0.6}" fill="#ffffff"/>`;
+    if (!o.transparent) {
+      s += `<rect x="${bx}" y="${by}" width="${bs}" height="${bs}" rx="${rad + pad * 0.6}" fill="#ffffff"/>`;
+    }
     s += `<image href="${tmp.toDataURL("image/png")}" x="${(W - lp) / 2}" y="${(W - lp) / 2}" width="${lp}" height="${lp}" preserveAspectRatio="xMidYMid meet"/>`;
   }
   return s + "</svg>";
@@ -189,6 +194,7 @@ type LogoState = { img: HTMLImageElement; clean: HTMLImageElement; name: string;
 type SavedLogo = { id: string; name: string; dataUrl: string };
 
 const QR_DEFAULT = {
+  kind: "link" as "link" | "text",
   text: "https://tokosaya.com",
   ec: "Q",
   size: "1024",
@@ -515,15 +521,48 @@ export default function BarcodeStudio({ user }: { user: User }) {
             <div className="card">
               <h2>Isi QR Code</h2>
               <div className="field">
-                <label>Teks / URL</label>
-                <textarea value={qr.text} onChange={(e) => setQ({ text: e.target.value })} placeholder="cth: https://tokosaya.com" />
+                <label>Jenis isi</label>
                 <div className="chips">
-                  <button className="chip" onClick={() => setQ({ text: "" })}>Teks kosong</button>
-                  <button className="chip" onClick={() => setQ({ text: "https://" })}>URL</button>
-                  <button className="chip" onClick={() => setQ({ text: "https://wa.me/62" })}>WhatsApp</button>
-                  <button className="chip" onClick={() => setQ({ text: "WIFI:T:WPA;S:NamaWiFi;P:password;;" })}>WiFi</button>
+                  <button
+                    className={`chip ${qr.kind === "link" ? "on" : ""}`}
+                    onClick={() => setQ({ kind: "link" })}
+                  >
+                    Link
+                  </button>
+                  <button
+                    className={`chip ${qr.kind === "text" ? "on" : ""}`}
+                    onClick={() => setQ({ kind: "text" })}
+                  >
+                    Tulisan
+                  </button>
                 </div>
               </div>
+              {qr.kind === "link" ? (
+                <div className="field">
+                  <label>Alamat link</label>
+                  <input
+                    type="text"
+                    value={qr.text}
+                    onChange={(e) => setQ({ text: e.target.value })}
+                    placeholder="https://tokosaya.com"
+                  />
+                  <div className="hint">Discan langsung membuka link. Contoh: https://tokosaya.com</div>
+                  <div className="chips">
+                    <button className="chip" onClick={() => setQ({ text: "https://wa.me/62" })}>WhatsApp</button>
+                    <button className="chip" onClick={() => setQ({ text: "WIFI:T:WPA;S:NamaWiFi;P:password;;" })}>WiFi</button>
+                  </div>
+                </div>
+              ) : (
+                <div className="field">
+                  <label>Tulisan</label>
+                  <textarea
+                    value={qr.text}
+                    onChange={(e) => setQ({ text: e.target.value })}
+                    placeholder="Ketik tulisan di sini..."
+                  />
+                  <div className="hint">Tulisan bebas — discan langsung tampil sebagai teks.</div>
+                </div>
+              )}
               <div className="row2">
                 <div className="field">
                   <label>Koreksi error</label>
@@ -551,16 +590,31 @@ export default function BarcodeStudio({ user }: { user: User }) {
 
             <div className="card">
               <h2>Warna &amp; Latar</h2>
+              <div className="field">
+                <label>Latar</label>
+                <div className="chips">
+                  <button
+                    className={`chip ${!qr.transparent ? "on" : ""}`}
+                    onClick={() => setQ({ transparent: false })}
+                  >
+                    Berwarna
+                  </button>
+                  <button
+                    className={`chip ${qr.transparent ? "on" : ""}`}
+                    onClick={() => setQ({ transparent: true })}
+                  >
+                    Transparan
+                  </button>
+                </div>
+                <div className="hint">
+                  Transparan: background dihilangkan total (file PNG), cocok ditempel ke desain/kemasan.
+                </div>
+              </div>
               <div className="row2">
                 <div className="field"><label>Warna kode</label><input type="color" value={qr.fg} onChange={(e) => setQ({ fg: e.target.value })} /></div>
-                <div className="field"><label>Warna latar</label><input type="color" value={qr.bg} onChange={(e) => setQ({ bg: e.target.value })} /></div>
-              </div>
-              <label className="check">
-                <input type="checkbox" checked={qr.transparent} onChange={(e) => setQ({ transparent: e.target.checked })} />
-                <span><b>Hapus background</b> — latar jadi transparan (PNG)</span>
-              </label>
-              <div className="hint" style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>
-                Cocok untuk ditempel di desain / kemasan tanpa kotak putih.
+                {!qr.transparent && (
+                  <div className="field"><label>Warna latar</label><input type="color" value={qr.bg} onChange={(e) => setQ({ bg: e.target.value })} /></div>
+                )}
               </div>
             </div>
 
@@ -688,14 +742,32 @@ export default function BarcodeStudio({ user }: { user: User }) {
 
             <div className="card">
               <h2>Warna &amp; Latar</h2>
+              <div className="field">
+                <label>Latar</label>
+                <div className="chips">
+                  <button
+                    className={`chip ${!bar.transparent ? "on" : ""}`}
+                    onClick={() => setB({ transparent: false })}
+                  >
+                    Berwarna
+                  </button>
+                  <button
+                    className={`chip ${bar.transparent ? "on" : ""}`}
+                    onClick={() => setB({ transparent: true })}
+                  >
+                    Transparan
+                  </button>
+                </div>
+                <div className="hint">
+                  Transparan: background dihilangkan total (file PNG), cocok ditempel ke desain/kemasan.
+                </div>
+              </div>
               <div className="row2">
                 <div className="field"><label>Warna bar</label><input type="color" value={bar.fg} onChange={(e) => setB({ fg: e.target.value })} /></div>
-                <div className="field"><label>Warna latar</label><input type="color" value={bar.bg} onChange={(e) => setB({ bg: e.target.value })} /></div>
+                {!bar.transparent && (
+                  <div className="field"><label>Warna latar</label><input type="color" value={bar.bg} onChange={(e) => setB({ bg: e.target.value })} /></div>
+                )}
               </div>
-              <label className="check">
-                <input type="checkbox" checked={bar.transparent} onChange={(e) => setB({ transparent: e.target.checked })} />
-                <span><b>Hapus background</b> — latar jadi transparan (PNG)</span>
-              </label>
             </div>
           </>
         )}

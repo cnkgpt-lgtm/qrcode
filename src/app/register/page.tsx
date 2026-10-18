@@ -40,7 +40,7 @@ export default function RegisterPage() {
       <div className="wrap single">
         <div className="authbox">
           <div className="card">
-            <h2>Buat akun Barcode Studio</h2>
+            <h2>Buat akun Accank Barcode Studio</h2>
             <div className={`err ${err ? "show" : ""}`}>{err}</div>
             <form onSubmit={submit}>
               <div className="field">

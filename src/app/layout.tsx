@@ -5,7 +5,7 @@ import "./globals.css";
 import { auth, signOut } from "@/auth";
 
 export const metadata: Metadata = {
-  title: "Barcode Studio — Buat QR & Barcode",
+  title: "Accank Barcode Studio — Buat QR & Barcode",
   description:
     "Buat QR Code & barcode siap cetak — tambah logo, hapus background, atur warna. Simpan riwayat per akun.",
 };
@@ -29,7 +29,7 @@ export default async function RootLayout({
             <div className="topnav">
               <div>
                 <h1>
-                  BARCODE<span>&nbsp;STUDIO</span>
+                  ACCANK BARCODE<span>&nbsp;STUDIO</span>
                 </h1>
                 <p>Buat QR Code &amp; barcode siap cetak — tambah logo, hapus background, atur warna.</p>
               </div>
@@ -59,7 +59,7 @@ export default async function RootLayout({
         {children}
         <footer>
           <div className="wrap">
-            Barcode Studio — riwayat &amp; logo tersimpan aman di akun Anda.
+            Accank Barcode Studio — riwayat &amp; logo tersimpan aman di akun Anda.
           </div>
         </footer>
       </body>

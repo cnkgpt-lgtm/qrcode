@@ -32,7 +32,7 @@ function LoginForm() {
       <div className="wrap single">
         <div className="authbox">
           <div className="card">
-            <h2>Masuk ke Barcode Studio</h2>
+            <h2>Masuk ke Accank Barcode Studio</h2>
             <div className={`err ${err ? "show" : ""}`}>{err}</div>
             <form onSubmit={submit}>
               <div className="field">
