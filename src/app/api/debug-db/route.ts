@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   const t0 = Date.now();
   try {
-    const r = await prisma.$queryRaw`SELECT 1 as ok`;
+    const r = await prisma.user.count();
     return NextResponse.json({ ok: true, ms: Date.now() - t0, r });
   } catch (e: any) {
     return NextResponse.json(
